@@ -1,12 +1,12 @@
-const MELAYANE_CACHE = "melayane-pwa-v1";
+const MELAYANE_CACHE = "melayane-pwa-v2";
 
 const MELAYANE_ASSETS = [
-  "./",
-  "./index.html",
-  "./manifest.json",
-  "./offline.html",
-  "./assets/icon-melayane-192-final.png",
-  "./assets/icon-melayane-512.png"
+  "/MELAYANE/",
+  "/MELAYANE/index.html",
+  "/MELAYANE/manifest.json",
+  "/MELAYANE/offline.html",
+  "/MELAYANE/assets/icon-melayane-192-final.png",
+  "/MELAYANE/assets/icon-melayane-512.png"
 ];
 
 self.addEventListener("install", function (event) {
@@ -50,6 +50,10 @@ self.addEventListener("fetch", function (event) {
   event.respondWith(
     fetch(pedido)
       .then(function (resposta) {
+        if (!resposta || resposta.status !== 200 || resposta.type === "opaque") {
+          return resposta;
+        }
+
         var copia = resposta.clone();
 
         caches.open(MELAYANE_CACHE).then(function (cache) {
@@ -65,7 +69,7 @@ self.addEventListener("fetch", function (event) {
           }
 
           if (pedido.mode === "navigate") {
-            return caches.match("./offline.html");
+            return caches.match("/MELAYANE/offline.html");
           }
 
           return Response.error();
