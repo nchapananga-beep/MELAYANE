@@ -1,25 +1,27 @@
 {
+  "id": "/MELAYANE/",
   "name": "MELAYANE",
   "short_name": "MELAYANE",
   "description": "MELAYANE — Gestão da CASA LINO",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/MELAYANE/",
+  "scope": "/MELAYANE/",
   "display": "standalone",
+  "display_override": ["standalone"],
   "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#0f5f4c",
   "icons": [
     {
-      "src": "assets/icon-melayane-192-final.png",
+      "src": "/MELAYANE/assets/icon-melayane-192-final.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "assets/icon-melayane-512.png",
+      "src": "/MELAYANE/assets/icon-melayane-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
