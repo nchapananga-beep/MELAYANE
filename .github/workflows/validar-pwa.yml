@@ -1,0 +1,82 @@
+name: Validar PWA
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obter código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Validar ficheiros obrigatórios
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          obrigatorios = [
+              "index.html",
+              "manifest.json",
+              "service-worker.js",
+              "offline.html",
+              "assets/icon-melayane-192-final.png",
+              "assets/icon-melayane-512.png",
+          ]
+
+          em_falta = [p for p in obrigatorios if not Path(p).exists()]
+          if em_falta:
+              raise SystemExit("Ficheiros em falta: " + ", ".join(em_falta))
+
+          print("Todos os ficheiros obrigatórios estão presentes.")
+          PY
+
+      - name: Validar manifest.json
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("manifest.json").read_text(encoding="utf-8"))
+
+          campos = ["name", "short_name", "start_url", "display", "icons"]
+          em_falta = [c for c in campos if not manifest.get(c)]
+          if em_falta:
+              raise SystemExit("Campos obrigatórios em falta no manifest: " + ", ".join(em_falta))
+
+          if not isinstance(manifest["icons"], list) or len(manifest["icons"]) < 2:
+              raise SystemExit("O manifest deve conter pelo menos dois ícones.")
+
+          print("manifest.json válido.")
+          PY
+
+      - name: Verificar referências principais do index.html
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          html = Path("index.html").read_text(encoding="utf-8")
+          referencias = [
+              'href="manifest.json"',
+              'service-worker.js',
+              'assets/icon-melayane-192-final.png',
+          ]
+
+          ausentes = [r for r in referencias if r not in html]
+          if ausentes:
+              raise SystemExit("Referências em falta no index.html: " + ", ".join(ausentes))
+
+          print("Referências principais do index.html confirmadas.")
+          PY
