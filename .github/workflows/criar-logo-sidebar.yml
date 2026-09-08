@@ -1,0 +1,54 @@
+name: Criar logo MELAYANE sidebar
+
+on:
+  push:
+    paths:
+      - '.github/workflows/criar-logo-sidebar.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  criar-logo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar Pillow
+        run: pip install pillow
+
+      - name: Criar versão reduzida do logo
+        run: |
+          python - <<'PY'
+          from PIL import Image
+
+          origem = 'assets/logo-melayane.png'
+          destino = 'assets/logo-melayane-sidebar.png'
+
+          img = Image.open(origem).convert('RGBA')
+          w, h = img.size
+
+          escala = 0.92
+          nw, nh = int(w * escala), int(h * escala)
+          menor = img.resize((nw, nh), Image.Resampling.LANCZOS)
+
+          fundo = Image.new('RGBA', (w, h), (255, 255, 255, 255))
+          x = (w - nw) // 2
+          y = (h - nh) // 2
+          fundo.alpha_composite(menor, (x, y))
+          fundo.convert('RGB').save(destino, optimize=True)
+          PY
+
+      - name: Gravar imagem no repositório
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/logo-melayane-sidebar.png
+          git commit -m 'Criar logo MELAYANE reduzido para sidebar'
+          git push
